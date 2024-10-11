@@ -11,6 +11,9 @@ from nbconvert import PythonExporter
 import joblib
 import pickle
 
+################################
+# Main app structure
+st.set_page_config(page_title="Bandaas", layout="wide")
 
 @st.cache_resource
 def load_image(image_path):
@@ -35,7 +38,7 @@ def Page_overview():
 
 ################################
 
-
+@st.cache_resource
 def Page_about_data():
     st.title("About data")
     st.subheader("Let's dive deeper into the data!")
@@ -135,7 +138,7 @@ def page_model():
 
 ################################
 
-
+@st.cache_resource
 def page_authors():
     st.title("Teammates")
     st.write("## Names")
@@ -168,8 +171,6 @@ def page_authors():
 #     writer.close()
 
 ################################
-
-
 def Page_feedback():
     st.title("Your feedback")
     user_input = st.text_input("Enter your feedback or data")
@@ -231,6 +232,12 @@ def page_visuals():
 # Model information
 # model = joblib.load("your_model_file.pkl")
 
+@st.cache_resource
+def load_model():
+    # return joblib.load("your_model_file.pkl")
+    pass
+
+model = load_model()
 
 def page_prediction():
     st.title("Prediction Section")
@@ -249,22 +256,20 @@ def page_prediction():
 
     # When user clicks the "Predict" button
     if st.button("Predict"):
-        if input1 and input2 and input3 and input4 and input5:
-            # Convert inputs into a format that your model expects (example: list or numpy array)
-            input_data = np.array([[input1, input2, input3, input4, input5]])
+        with st.spinner("Precicting..."):
+            if input1 and input2 and input3 and input4 and input5:
+                # Convert inputs into a format that your model expects (example: list or numpy array)
+                input_data = np.array([[input1, input2, input3, input4, input5]])
 
-            # Pass the input data to the model for prediction
-            # prediction = model.predict(input_data)
+                # Pass the input data to the model for prediction
+                # prediction = model.predict(input_data)
 
-            # Show prediction results to user
-            # st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
-        else:
-            st.warning("Please fill all the inputs!")
+                # Show prediction results to user
+                # st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+            else:
+                st.warning("Please fill all the inputs!")
+        st.success(f"Prediction result: {prediction_type[0]}") # ! Need to be modified to Hameedoo
 
-
-################################
-# Main app structure
-st.set_page_config(page_title="Bandaas", layout="wide")
 
 
 ################################
