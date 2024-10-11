@@ -21,7 +21,7 @@ def load_image(image_path):
 
 def page_image_display():
     st.title("LOOK OUT!!!")
-    image = load_image("accident1.jpg")
+    image = load_image("two_cars.png")
     st.image(image, caption="We are a collabortive Team!")
 
 ################################
