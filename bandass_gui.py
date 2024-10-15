@@ -143,10 +143,10 @@ def page_authors():
     st.title("Teammates")
     st.write("## Names")
     st.write("""
-    - Ahmed Yasser
-    - Ahmed Abd El-Hameed
+    - Ahmed Yasser 
+    - Ahmed Abd El-Hameed (7ameedo)
     - Abram Maher
-    - Sarah Selim
+    - Sarah Mohammed Selim
     - Naglaa Reda
     """)
     st.write(" We wish you enjoy this journey!")
@@ -244,7 +244,7 @@ def page_prediction():
 
     # Dropdown for prediction choice
     prediction_type = st.selectbox("Select what you'd like to predict", [
-                                   "Classification 1", "Classification 2", "Regression"])
+                                   "Accident Severity", "Causuality severity", "Number of Casuality"])
 
     # Input fields for user to provide data
     st.write("Please provide the following details:")
@@ -268,7 +268,7 @@ def page_prediction():
                 # st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
             else:
                 st.warning("Please fill all the inputs!")
-        st.success(f"Prediction result: {prediction_type[0]}") # ! Need to be modified to Hameedoo
+        st.success(f"Prediction result: {prediction_type[0]}") # ! Need to be modified by Hameedoo
 
 
 
