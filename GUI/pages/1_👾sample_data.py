@@ -13,6 +13,9 @@ import pickle
 # Main app structure
 st.set_page_config(page_title="Our Project Insights", layout="wide", page_icon= r"GUI\images\exploratory-analysis.png")
 ################################
+def load_image(image_path):
+    return Image.open(image_path)
+################################
 @st.cache_resource
 def Page_about_data():
     st.title("About data")
@@ -66,7 +69,6 @@ def Page_about_data():
         - Car_Passenger: Car passenger details (e.g., make, model, year)
         - Bus_or_Coach_Passenger: Bus or coach passenger details (e.g., make, model, year)
         - Pedestrian_Road_Maintenance_Worker: Pedestrian road maintenance worker details (e.g., make, model, year)
-        
     """)
 
     st.write("## Acknowledgements")
@@ -77,11 +79,16 @@ def Page_about_data():
         "The data has been cleaned, filtered, and transformed to prepare it for analysis.")
     # ! the cleaned datase link
     st.write(r"For more information, visit: Link for the cleaned dataset")
-    st.write("## Data Visualization")
-    st.write(
-        "We have created various visualizations to help you understand the data and gain insights.")
-    st.write("## Data Analysis")
-    st.write("We have performed various statistical analyses and visualizations to help you gain insights into the data.")
+    st.write("## Data Analysis and Visualization ")
+    st.write("We have performed various statistical analysis and visualizations to help you gain insights into the data")
+    st.write("### some of Data art")
+    image = load_image(r"analysis_images\correlation.png")
+    st.image(image)
+    image = load_image(r"analysis_images\HeatmapofAccidentSeveritybyRoadSurface.png")
+    st.image(image)
+    image = load_image(r"analysis_images\urban_vs_rural.png")
+    st.image(image)
+
     st.write("## Data Export")
     st.write("We have provided various options to export the data in various formats.")
     st.write("## Data Contribution")
