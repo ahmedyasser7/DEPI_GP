@@ -76,7 +76,7 @@ def page_visuals():
 # model2 = pickle.load(open(r"Models\Casualty_Severity_Model.pkl", "rb"))
 # model3 = pickle.load(open(r"Models\Mapping_Model.pkl", "rb"))
 # model4 = pickle.load(open(r"Models\No_Of_Casualities_Model.pkl", "rb"))
-@st.cache_resource
+
 def load_models():
     model_paths = [
         r"Models\Accident_Severity_Model.pkl",
@@ -86,16 +86,21 @@ def load_models():
     ]
 
     models = []
-
     for path in model_paths:
-        with open(path, "rb") as file:
-            models.append(pickle.load(file))
-
+        try:
+            with open(path, "rb") as file:
+                models.append(pickle.load(file))
+        except Exception as e:
+            st.error(f"Error loading model from {path}: {str(e)}")
+            return None
     return tuple(models)
 
 models = load_models()
-model1, model2, model3, model4 = models
-@st.cache_resource
+if models:
+    model1, model2, model3, model4 = models
+else:
+    st.stop()
+
 def page_prediction():
     st.title("Prediction Section")
     prediction_type = st.selectbox("Select what you'd like to predict", [
