@@ -38,9 +38,8 @@ def page_image_display():
 @st.cache_resource
 def Page_overview():
     st.title("Overview")
-    st.write(f"The link for the GitHub Repo")
-    st.write(f"The link for the Documentation")
-    st.write(f"The link for the Presentation")
+    st.write(f"The link for the GitHub Repo: https://github.com/ahmedyasser7/DEPI_GP")
+    st.write(f"The link for the Documentation and the presentaion: {4}")
 
 
 ################################
@@ -49,11 +48,11 @@ def page_authors():
     st.title("Teammates")
     st.write("## Names")
     st.write("""
-    - Ahmed Yasser 
-    - Ahmed Abd El-Hameed (7ameedo)
-    - Abram Maher
+    - Ahmed Yasser Taha
+    - Ahmed Abd El-Hameed
+    - Abram Maher Samwel
     - Sarah Mohammed Selim
-    - Naglaa Reda
+    - Naglaa Reda Ali
     """)
     st.write(" We wish you enjoy this journey!")
 
