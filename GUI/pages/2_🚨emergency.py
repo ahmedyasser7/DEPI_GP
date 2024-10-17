@@ -58,14 +58,19 @@ def page_visuals():
 
 ################################
 # Model information
-# model = joblib.load("your_model_file.pkl")
-
 @st.cache_resource
-def load_model():
-    # return joblib.load("your_model_file.pkl")
-    pass
+def load_models():
+    with open("model1.pkl", "rb") as file1:
+        model1 = pickle.load(file1)
+    with open("model2.pkl", "rb") as file2:
+        model2 = pickle.load(file2)
+    with open("model3.pkl", "rb") as file3:
+        model3 = pickle.load(file3)
+    with open("model4.pkl", "rb") as file4:
+        model4 = pickle.load(file4)
+    return model1, model2, model3, model4
 
-model = load_model()
+models = load_models() 
 
 def page_prediction():
     st.title("Prediction Section")
