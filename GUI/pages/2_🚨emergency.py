@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 from nbconvert import PythonExporter
-
+import xgboost
 import pickle
 
 ################################
@@ -60,32 +60,66 @@ def page_visuals():
 # Model information
 @st.cache_resource
 def load_models():
-    with open("model1.pkl", "rb") as file1:
+    with open(r"Models\Accident_Severity_Model.pkl", "rb") as file1:
         model1 = pickle.load(file1)
-    with open("model2.pkl", "rb") as file2:
+    with open(r"Models\Casualty_Severity_Model.pkl", "rb") as file2:
         model2 = pickle.load(file2)
-    with open("model3.pkl", "rb") as file3:
+    with open(r"Models\Mapping_Model.pkl", "rb") as file3:
         model3 = pickle.load(file3)
-    with open("model4.pkl", "rb") as file4:
+    with open(r"Models\No_Of_Casualities_Model.pkl", "rb") as file4:
         model4 = pickle.load(file4)
     return model1, model2, model3, model4
 
-models = load_models() 
+# models = load_models() 
 
 def page_prediction():
     st.title("Prediction Section")
 
     # Dropdown for prediction choice
     prediction_type = st.selectbox("Select what you'd like to predict", [
-                                   "Accident Severity", "Causuality severity", "Number of Casuality"])
+                                   "Accident Severity", "Causuality severity", "Number of Casualities", "Mapping"])
+    
+    if prediction_type == "Accident Severity":
+        st.write("Please provide the following details:")
+        input1 = st.text_input("Longitude:")
+        input2 = st.text_input("Latitude")
+        input3 = st.text_input("Number_of_Vehicles")
+        input4 = st.text_input("Number_of_Casualties")
+        input5 = st.text_input("Day_of_Week")
+        input6 = st.text_input("Local_Authority_(District)")
+        input7 = st.text_input("Local_Authority_(Highway)")
+        input8 = st.text_input("Speed_limit")
+        input9 = st.text_input("Light_Conditions")
+        input10 = st.text_input("Weather_Conditions")
+        input11 = st.text_input("Road_Surface_Conditions")
+        input12 = st.text_input("Special_Conditions_at_Site")
+        input13 = st.text_input("Urban_or_Rural_Area")
+        # OUTPUT: Accident_Severity
 
-    # Input fields for user to provide data
-    st.write("Please provide the following details:")
-    input1 = st.text_input("Input 1:")
-    input2 = st.text_input("Input 2:")
-    input3 = st.text_input("Input 3:")
-    input4 = st.text_input("Input 4:")
-    input5 = st.text_input("Input 5:")
+    elif prediction_type == "Causuality severity":
+        st.write("Please provide the following details:")
+        input1 = st.text_input("Sex_of_Casualty")
+        input2 = st.text_input("Age_of_Casualty")
+        input3 = st.text_input("Car_Passenger")
+        input4 = st.text_input("Bus_or_Coach_Passenger")
+        input5 = st.text_input("Casualty_Type")
+        #OUTPUT: Casualty_Severity
+
+    elif prediction_type == "Number of Casualities":
+        st.write("Please provide the following details:")
+        input1 = st.text_input("Number_of_Vehicles")
+        input2 = st.text_input("Speed_limit")
+        input3 = st.text_input("Light_Conditions")
+        input4 = st.text_input("Weather_Conditions")
+        input5 = st.text_input("Road_Surface_Conditions")
+        #OUTPUT: Number_of_Casualties
+        
+    elif prediction_type == "Mapping":
+        st.write("Please provide the following details:")
+        input1 = st.text_input("Was_Vehicle_Left_Hand_Drive?")
+        input2 = st.text_input("Age_of_Driver")
+        input3 = st.text_input("Age_of_Vehicle")
+        # OUTPUT: Accident_involved
 
     # When user clicks the "Predict" button
     if st.button("Predict"):
