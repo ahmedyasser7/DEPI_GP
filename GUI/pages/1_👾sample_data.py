@@ -8,13 +8,24 @@ import seaborn as sns
 import plotly.express as px
 from nbconvert import PythonExporter
 import pickle
+import os
+###############################
+BASE_DIR = os.path.dirname(__file__)  # Current directory where Bandass.py exists
+IMAGE_DIR = os.path.join(BASE_DIR, "images")  # Set the path to the images directory 
+ANALYSIS_IMAGE_DIR = os.path.join(BASE_DIR, "analysis_images")
 
 ################################
 # Main app structure
-st.set_page_config(page_title="Our Project Insights", layout="wide", page_icon= r"GUI\images\exploratory-analysis.png")
+st.set_page_config(page_title="Our Project Insights", layout="wide", page_icon= r"images/exploratory-analysis.png")
 ################################
 def load_image(image_path):
-    return Image.open(image_path)
+    try:
+        print(f"Loading image from: {image_path}")  # Debugging line
+        return Image.open(image_path)
+    except FileNotFoundError:
+        st.error(f"Image not found: {image_path}")  # Improved error message
+        return None
+
 ################################
 @st.cache_resource
 def Page_about_data():
@@ -77,25 +88,30 @@ def Page_about_data():
     st.write("## Data Preparation")
     st.write(
         "The data has been cleaned, filtered, and transformed to prepare it for analysis.")
-    # ! the cleaned datase link
+    st.write("For more information, visit:1- https://drive.google.com/file/d/1cE5rwGA3ZVW3x-wXaZNWrsHYj4KCuyzr/view?usp=drive_link\
+        ,2- https://drive.google.com/file/d/1INPspVo4f1nl_WoG2V7PXqq1YJIBmZ05/view?usp=drive_link ,\
+        3- https://drive.google.com/file/d/1uvQ4_PaihZNbvRbA4FNZfRssplMB5oUX/view?usp=drive_link .")
     st.write(r"For more information, visit: Link for the cleaned dataset")
     st.write("## Data Analysis and Visualization ")
     st.write("We have performed various statistical analysis and visualizations to help you gain insights into the data")
-    st.write("### some of Data art")
-    image = load_image(r"analysis_images\correlation.png")
-    st.image(image)
-    image = load_image(r"analysis_images\HeatmapofAccidentSeveritybyRoadSurface.png")
-    st.image(image)
-    image = load_image(r"analysis_images\urban_vs_rural.png")
-    st.image(image)
+    st.write("### Some Of Data Art")
+    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "correlation.png"))
+    if image is not None:  # Only display if the image was loaded successfully
+        st.image(image)
+    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "HeatmapofAccidentSeveritybyRoadSurface.png"))
+    if image is not None:  # Only display if the image was loaded successfully
+        st.image(image)
+    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "urban_vs_rural.png"))  # Load the image
+    if image is not None:  # Only display if the image was loaded successfully
+        st.image(image)
 
-    st.write("## Data Export")
-    st.write("We have provided various options to export the data in various formats.")
+    # st.write("## Data Export")
+    # st.write("We have provided various options to export the data in various formats.")
     st.write("## Data Contribution")
     st.write("We invite you to contribute to the data by providing feedback, reporting issues, or requesting additional data.")
     st.write("## Data Feedback")
     st.write(
-        "If you have any questions, concerns, or feedback, please contact us at:  ")
+        "If you have any questions, concerns, or feedback, please contact us at the feedback page")
 ################################
 def page_model():
     st.title("Model")

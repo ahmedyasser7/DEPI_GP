@@ -1,14 +1,16 @@
-nbformat == 5.10.4
-streamlit == 1.32.0 
-scikit-learn == 1.4.2 
-Pillow == 10.4.0
-numpy == 1.26.0
-pandas == 2.2.2
-matplotlib == 3.8.4
-seaborn == 0.13.2
-openpyxl == 3.1.2
-plotly == 5.23.0
-nbconvert == 7.10.0
-imbalanced-learn == 0.12.4
-xgboost == 2.1.1
-collections == 4.5.0-M2
+streamlit
+nbformat
+scikit-learn
+Pillow
+numpy
+pandas
+matplotlib
+seaborn
+openpyxl
+plotly
+nbconvert
+imbalanced-learn
+xgboost
+altair
+scipy
+lxml[html_clean]
