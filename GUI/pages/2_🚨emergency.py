@@ -80,7 +80,7 @@ def page_visuals():
 def load_models():
     model_paths = [
         r"Models\Accident_Severity_Model.pkl",
-        r"Models\Casualty_Severity_Model.pkl",
+        r"Models\Casualty_Severity_Model_new.pkl",
         r"Models\Mapping_Model.pkl",
         r"Models\No_Of_Casualities_Model.pkl"
     ]
@@ -95,7 +95,7 @@ def load_models():
 
 models = load_models()
 model1, model2, model3, model4 = models
-
+@st.cache_resource
 def page_prediction():
     st.title("Prediction Section")
     prediction_type = st.selectbox("Select what you'd like to predict", [
@@ -109,25 +109,24 @@ def page_prediction():
         input4 = st.text_input("Number_of_Casualties")
         input5 = st.text_input("Day_of_Week")
         input6 = st.text_input("Local_Authority_(District)")
-        input7 = st.text_input("Local_Authority_(Highway)")
+        input7 = st.text_input("Urban_or_Rural_Area")
         input8 = st.text_input("Speed_limit")
         input9 = st.text_input("Light_Conditions")
         input10 = st.text_input("Weather_Conditions")
         input11 = st.text_input("Road_Surface_Conditions")
         input12 = st.text_input("Special_Conditions_at_Site")
-        input13 = st.text_input("Urban_or_Rural_Area")
         
         Accident_Severity = pd.DataFrame({
             'Longitude': [input1], 'Latitude': [input2], 'Number_of_Vehicles': [input3], 'Number_of_Casualties': [input4], 
-            'Day_of_Week': [input5], 'Local_Authority_(District)': [input6], 'Local_Authority_(Highway)':[input7],
+            'Day_of_Week': [input5], 'Local_Authority_(District)': [input6],'Urban_or_Rural_Area' :[input7],
             'Speed_limit': [input8], 'Light_Conditions': [input9], 'Weather_Conditions': [input10],
-            'Road_Surface_Conditions': [input11], 'Special_Conditions_at_Site': [input12], 'Urban_or_Rural_Area': [input13]
+            'Road_Surface_Conditions': [input11], 'Special_Conditions_at_Site': [input12]
         }, index= [0])
         
         predict = st.button("Predict")
         if predict:
             with st.spinner("Precicting..."):
-                if input1 and input2 and input3 and input4 and input5 and input6 and input7 and input8 and input9 and input10 and input11 and input12 and input13: 
+                if input1 and input2 and input3 and input4 and input5 and input6 and input7 and input8 and input9 and input10 and input11 and input12: 
                     # Pass the input data to the model for prediction
                     prediction = model1.predict(Accident_Severity)
                     # Show prediction results to user
@@ -138,11 +137,20 @@ def page_prediction():
 
     elif prediction_type == "Causuality severity":
         st.write("Please provide the following details:")
+        Casualty_type = {0: 'Pedestrian', 1: 'Cyclist', 2: 'Motorcycle 50cc and under rider or passenger',
+        3: 'Motorcycle 125cc and under rider or passenger', 4: 'Motorcycle over 125cc and up to 500cc rider or  passenger',
+        5: 'Motorcycle over 500cc rider or passenger', 8: 'Taxi/Private hire car occupant', 
+        9: 'Car occupant', 10: 'Minibus (8 - 16 passenger seats) occupant', 11: 'Bus or coach occupant (17 or more pass seats)', 
+        16: 'Horse rider', 17: 'Agricultural vehicle occupant', 18: 'Tram occupant', 19: 'Van / Goods vehicle (3.5 tonnes mgw or under) occupant',
+        20: 'Goods vehicle (over 3.5t. and under 7.5t.) occupant', 21: 'Goods vehicle (7.5 tonnes mgw and over) occupant', 
+        22: 'Mobility scooter rider', 23: 'Electric motorcycle rider or passenger', 90: 'Other vehicle occupant', 
+        97: 'Motorcycle - unknown cc rider or passenger', 98: 'Goods vehicle (unknown weight) occupant'}
+        
         input1 = st.text_input("Sex_of_Casualty")
         input2 = st.text_input("Age_of_Casualty")
         input3 = st.text_input("Car_Passenger")
         input4 = st.text_input("Bus_or_Coach_Passenger")
-        input5 = st.text_input("Casualty_Type")
+        input5 = st.selectbox("Choose", Casualty_type.values())
         Casualty_Severity = pd.DataFrame({
             'Sex_of_Casualty': [input1], 'Age_of_Casualty': [input2], 'Car_Passenger': [input3], 'Bus_or_Coach_Passenger': [input4], 
             'Casualty_Type': [input5]
