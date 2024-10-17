@@ -9,6 +9,8 @@ import plotly.express as px
 from nbconvert import PythonExporter
 import xgboost
 import pickle
+import h5py
+
 
 ################################
 # Main app structure
@@ -58,30 +60,51 @@ def page_visuals():
 
 ################################
 # Model information
+
+# def load_models():
+#     with open(r"Models\Accident_Severity_Model.pkl", "rb") as file1:
+#         model1 = pickle.load(file1)
+#     with open(r"Models\Casualty_Severity_Model.pkl", "rb") as file2:
+#         model2 = pickle.load(file2)
+#     with open(r"Models\Mapping_Model.pkl", "rb") as file3:
+#         model3 = pickle.load(file3)
+#     with open(r"Models\No_Of_Casualities_Model.pkl", "rb") as file4:
+#         model4 = pickle.load(file4)
+#     return model1, model2, model3, model4
+
+# models = load_models()
+# model1 = pickle.load(open(r"Models\Accident_Severity_Model.pkl", "rb"))
+# model2 = pickle.load(open(r"Models\Casualty_Severity_Model.pkl", "rb"))
+# model3 = pickle.load(open(r"Models\Mapping_Model.pkl", "rb"))
+# model4 = pickle.load(open(r"Models\No_Of_Casualities_Model.pkl", "rb"))
 @st.cache_resource
 def load_models():
-    with open(r"Models\Accident_Severity_Model.pkl", "rb") as file1:
-        model1 = pickle.load(file1)
-    with open(r"Models\Casualty_Severity_Model.pkl", "rb") as file2:
-        model2 = pickle.load(file2)
-    with open(r"Models\Mapping_Model.pkl", "rb") as file3:
-        model3 = pickle.load(file3)
-    with open(r"Models\No_Of_Casualities_Model.pkl", "rb") as file4:
-        model4 = pickle.load(file4)
-    return model1, model2, model3, model4
+    model_paths = [
+        r"Models\Accident_Severity_Model.pkl",
+        r"Models\Casualty_Severity_Model.pkl",
+        r"Models\Mapping_Model.pkl",
+        r"Models\No_Of_Casualities_Model.pkl"
+    ]
 
-# models = load_models() 
+    models = []
+
+    for path in model_paths:
+        with open(path, "rb") as file:
+            models.append(pickle.load(file))
+
+    return tuple(models)
+
+models = load_models()
+model1, model2, model3, model4 = models
 
 def page_prediction():
     st.title("Prediction Section")
-
-    # Dropdown for prediction choice
     prediction_type = st.selectbox("Select what you'd like to predict", [
                                    "Accident Severity", "Causuality severity", "Number of Casualities", "Mapping"])
     
     if prediction_type == "Accident Severity":
         st.write("Please provide the following details:")
-        input1 = st.text_input("Longitude:")
+        input1 = st.text_input("Longitude")
         input2 = st.text_input("Latitude")
         input3 = st.text_input("Number_of_Vehicles")
         input4 = st.text_input("Number_of_Casualties")
@@ -94,7 +117,25 @@ def page_prediction():
         input11 = st.text_input("Road_Surface_Conditions")
         input12 = st.text_input("Special_Conditions_at_Site")
         input13 = st.text_input("Urban_or_Rural_Area")
-        # OUTPUT: Accident_Severity
+        
+        Accident_Severity = pd.DataFrame({
+            'Longitude': [input1], 'Latitude': [input2], 'Number_of_Vehicles': [input3], 'Number_of_Casualties': [input4], 
+            'Day_of_Week': [input5], 'Local_Authority_(District)': [input6], 'Local_Authority_(Highway)':[input7],
+            'Speed_limit': [input8], 'Light_Conditions': [input9], 'Weather_Conditions': [input10],
+            'Road_Surface_Conditions': [input11], 'Special_Conditions_at_Site': [input12], 'Urban_or_Rural_Area': [input13]
+        }, index= [0])
+        
+        predict = st.button("Predict")
+        if predict:
+            with st.spinner("Precicting..."):
+                if input1 and input2 and input3 and input4 and input5 and input6 and input7 and input8 and input9 and input10 and input11 and input12 and input13: 
+                    # Pass the input data to the model for prediction
+                    prediction = model1.predict(Accident_Severity)
+                    # Show prediction results to user
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                else:
+                    st.warning("Please fill all the inputs!")
+            st.success(f"Prediction result: {prediction_type[0]}")
 
     elif prediction_type == "Causuality severity":
         st.write("Please provide the following details:")
@@ -103,7 +144,22 @@ def page_prediction():
         input3 = st.text_input("Car_Passenger")
         input4 = st.text_input("Bus_or_Coach_Passenger")
         input5 = st.text_input("Casualty_Type")
-        #OUTPUT: Casualty_Severity
+        Casualty_Severity = pd.DataFrame({
+            'Sex_of_Casualty': [input1], 'Age_of_Casualty': [input2], 'Car_Passenger': [input3], 'Bus_or_Coach_Passenger': [input4], 
+            'Casualty_Type': [input5]
+        }, index= [0])
+        
+        predict = st.button("Predict")
+        if predict:
+            with st.spinner("Precicting..."):
+                if input1 and input2 and input3 and input4 and input5: 
+                    # Pass the input data to the model for prediction
+                    prediction = model2.predict(Casualty_Severity)
+                    # Show prediction results to user
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                else:
+                    st.warning("Please fill all the inputs!")
+            st.success(f"Prediction result: {prediction_type[0]}")
 
     elif prediction_type == "Number of Casualities":
         st.write("Please provide the following details:")
@@ -113,29 +169,43 @@ def page_prediction():
         input4 = st.text_input("Weather_Conditions")
         input5 = st.text_input("Road_Surface_Conditions")
         #OUTPUT: Number_of_Casualties
+        Number_of_Casualties = pd.DataFrame({
+            'Number_of_Vehicles': [input1], 'Speed_limit': [input2], 'Light_Conditions': [input3], 'Weather_Conditions': [input4], 
+            'Road_Surface_Conditions': [input5]
+        }, index= [0])
         
+        predict = st.button("Predict")
+        if predict:
+            with st.spinner("Precicting..."):
+                if input1 and input2 and input3 and input4 and input5: 
+                    # Pass the input data to the model for prediction
+                    prediction = model3.predict(Number_of_Casualties)
+                    # Show prediction results to user
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                else:
+                    st.warning("Please fill all the inputs!")
+            st.success(f"Prediction result: {prediction_type[0]}")
     elif prediction_type == "Mapping":
         st.write("Please provide the following details:")
         input1 = st.text_input("Was_Vehicle_Left_Hand_Drive?")
         input2 = st.text_input("Age_of_Driver")
         input3 = st.text_input("Age_of_Vehicle")
         # OUTPUT: Accident_involved
-
-    # When user clicks the "Predict" button
-    if st.button("Predict"):
-        with st.spinner("Precicting..."):
-            if input1 and input2 and input3 and input4 and input5:
-                # Convert inputs into a format that your model expects (example: list or numpy array)
-                input_data = np.array([[input1, input2, input3, input4, input5]])
-
-                # Pass the input data to the model for prediction
-                # prediction = model.predict(input_data)
-
-                # Show prediction results to user
-                # st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
-            else:
-                st.warning("Please fill all the inputs!")
-        st.success(f"Prediction result: {prediction_type[0]}") # ! Need to be modified by Hameedoo
+        Accident_involved = pd.DataFrame({
+            'Was_Vehicle_Left_Hand_Drive': [input1], 'Age_of_Driver': [input2], 'Age_of_Vehicle': [input3]
+        }, index= [0])
+        
+        predict = st.button("Predict")
+        if predict:
+            with st.spinner("Precicting..."):
+                if input1 and input2 and input3: 
+                    # Pass the input data to the model for prediction
+                    prediction = model4.predict(Accident_involved)
+                    # Show prediction results to user
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                else:
+                    st.warning("Please fill all the inputs!")
+            st.success(f"Prediction result: {prediction_type[0]}")
 
 ################################
 EM_SUBPAGES = {

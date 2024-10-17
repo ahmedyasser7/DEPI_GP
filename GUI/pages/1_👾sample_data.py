@@ -88,17 +88,19 @@ def Page_about_data():
     st.write("## Data Preparation")
     st.write(
         "The data has been cleaned, filtered, and transformed to prepare it for analysis.")
-    st.write("For more information, visit:1- https://drive.google.com/file/d/1cE5rwGA3ZVW3x-wXaZNWrsHYj4KCuyzr/view?usp=drive_link\
-        ,2- https://drive.google.com/file/d/1INPspVo4f1nl_WoG2V7PXqq1YJIBmZ05/view?usp=drive_link ,\
-        3- https://drive.google.com/file/d/1uvQ4_PaihZNbvRbA4FNZfRssplMB5oUX/view?usp=drive_link .")
-    st.write(r"For more information, visit: Link for the cleaned dataset")
+    st.write("For more information, visit:")
+    st.markdown("""
+            - https://drive.google.com/file/d/1cE5rwGA3ZVW3x-wXaZNWrsHYj4KCuyzr/view?usp=drive_link
+            - https://drive.google.com/file/d/1INPspVo4f1nl_WoG2V7PXqq1YJIBmZ05/view?usp=drive_link 
+            - https://drive.google.com/file/d/1uvQ4_PaihZNbvRbA4FNZfRssplMB5oUX/view?usp=drive_link 
+        """)
     st.write("## Data Analysis and Visualization ")
     st.write("We have performed various statistical analysis and visualizations to help you gain insights into the data")
     st.write("### Some Of Data Art")
     image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "correlation.png"))
     if image is not None:  # Only display if the image was loaded successfully
         st.image(image)
-    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "HeatmapofAccidentSeveritybyRoadSurface.png"))
+    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "rural_vs_urban.png"))
     if image is not None:  # Only display if the image was loaded successfully
         st.image(image)
     image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "urban_vs_rural.png"))  # Load the image
