@@ -13,7 +13,7 @@ import pickle
 
 ################################
 # Main app structure
-st.set_page_config(page_title="Feedback", layout="wide", page_icon= r"GUI\images\good-feedback.png")
+st.set_page_config(page_title="Feedback", layout="wide", page_icon= r"GUI\home_images\good-feedback.png")
 
 ################################
 ################################

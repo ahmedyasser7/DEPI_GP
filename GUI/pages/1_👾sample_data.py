@@ -27,14 +27,14 @@ def load_image(image_path):
         return None
 
 ################################
-@st.cache_resource
 def Page_about_data():
     st.title("About data")
     st.subheader("Let's dive deeper into the data!")
     st.write("## Data Description")
     st.write("This data is from the UK government's National Transportation Safety Board (NTSB). It provides details about road accidents in the UK.")
+    st.divider()
+    
     st.write("## Data Columns")
-
     st.markdown("""
         * Accident_Index: Unique identifier for each accident
         * Location_Easting: Easting coordinate for the accident location 
@@ -81,10 +81,13 @@ def Page_about_data():
         - Bus_or_Coach_Passenger: Bus or coach passenger details (e.g., make, model, year)
         - Pedestrian_Road_Maintenance_Worker: Pedestrian road maintenance worker details (e.g., make, model, year)
     """)
-
+    st.divider()
+    
     st.write("## Acknowledgements")
     st.write("This dataset is provided by the UK government's National Transportation Safety Board (NTSB).")
     st.write("For more information, visit:https://www.kaggle.com/datasets/benoit72/uk-accidents-10-years-history-with-many-variables")
+    st.divider()
+    
     st.write("## Data Preparation")
     st.write(
         "The data has been cleaned, filtered, and transformed to prepare it for analysis.")
@@ -94,42 +97,99 @@ def Page_about_data():
             - https://drive.google.com/file/d/1INPspVo4f1nl_WoG2V7PXqq1YJIBmZ05/view?usp=drive_link 
             - https://drive.google.com/file/d/1uvQ4_PaihZNbvRbA4FNZfRssplMB5oUX/view?usp=drive_link 
         """)
+    st.divider()
+    
     st.write("## Data Analysis and Visualization ")
     st.write("We have performed various statistical analysis and visualizations to help you gain insights into the data")
     st.write("### Some Of Data Art")
-    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "correlation.png"))
-    if image is not None:  # Only display if the image was loaded successfully
-        st.image(image)
-    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "rural_vs_urban.png"))
-    if image is not None:  # Only display if the image was loaded successfully
-        st.image(image)
-    image = load_image(os.path.join(ANALYSIS_IMAGE_DIR, "urban_vs_rural.png"))  # Load the image
-    if image is not None:  # Only display if the image was loaded successfully
-        st.image(image)
+    
+    images = [
+        r"GUI\pages\analysis_images\correlation.png",
+        r"GUI\pages\analysis_images\HeatmapofAccidentSeveritybyRoadSurface.png",
+        r"GUI\pages\analysis_images\rural_vs_urban.png",
+    ]
+    
+    st.markdown("""
+        <style>
+        .btn-style {
+            background-color: #851CA3;
+            color: purple;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .btn-style:hover {
+            background-color: #AAAAAA;
+        }
+        .slider-indicators {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .slider-indicators span {
+            height: 15px;
+            width: 15px;
+            margin: 0 5px;
+            display: inline-block;
+            background-color: #bbb;
+            border-radius: 50%;
+        }
+        .slider-indicators .active {
+            background-color: #171717;
+        }
+        </style>
+    """, unsafe_allow_html=True)
 
-    # st.write("## Data Export")
-    # st.write("We have provided various options to export the data in various formats.")
+    if "carousel_index" not in st.session_state:
+        st.session_state.carousel_index = 0
+
+    st.image(images[st.session_state.carousel_index], width=700)
+
+    prev, _, next = st.columns([1, 10, 1])
+    
+    if prev.button("⬅️", key="prev", help="Previous image", type="primary"):
+        st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(images)
+
+    if next.button("➡️", key="next", help="Next image", type="primary"):
+        st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
+
+    st.write(f"Image {st.session_state.carousel_index + 1} of {len(images)}")
+    st.divider()
+    
     st.write("## Data Contribution")
     st.write("We invite you to contribute to the data by providing feedback, reporting issues, or requesting additional data.")
+    st.divider()
+    
     st.write("## Data Feedback")
     st.write(
         "If you have any questions, concerns, or feedback, please contact us at the feedback page")
 ################################
 def page_model():
-    st.title("Model")
+    st.title("Model Information")
     st.subheader("Let's create a predictive model!")
     st.write("## Model Description")
     st.write("We have developed a predictive model using machine learning algorithms.")
+    st.divider()
+    
     st.write("## Model Architecture")
     st.write(
         "We have used a combination of linear regression, decision trees, and random forests.")
+    st.divider()
+    
     st.write("## Model Performance")
     st.write(
         f"The model has achieved an accuracy of **85%** :D  on a validation dataset.")
+    st.divider()
+    
     st.write("## Model Evaluation")
     st.write("We have evaluated the model using various evaluation metrics, such as mean absolute error, mean squared error, and R-squared.")
+    st.divider()
+    
     st.write("## Model Deployment")
     st.write("We have deployed the model as a web service using streamlit library.")
+    st.divider()
+    
     st.write("## Model Contribution")
     st.write("We invite you to contribute to the model by improving its")
     

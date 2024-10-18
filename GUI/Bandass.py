@@ -45,16 +45,96 @@ def Page_overview():
 ################################
 @st.cache_resource
 def page_authors():
-    st.title("Teammates")
-    st.write("## Names")
-    st.write("""
-    - Ahmed Yasser Taha
-    - Ahmed Abd El-Hameed
-    - Abram Maher Samwel
-    - Sarah Mohammed Selim
-    - Naglaa Reda Ali
-    """)
-    st.write(" We wish you enjoy this journey!")
+    st.markdown("""
+            <style>
+            .author-container {
+                background-color: #111111;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .author-title {
+                color: #FF6F61;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .author-list {
+                list-style-type: none;
+                padding: 0;
+            }
+            .author-list li {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+            .author-list li a {
+                margin-left: 10px;
+                color: #0072b1; /* LinkedIn blue */
+                text-decoration: none;
+            }
+            .author-list li a:hover {
+                color: #005582; /* Darker LinkedIn blue on hover */
+            }
+            .linkedin-icon {
+                width: 20px;
+                height: 20px;
+            }
+            .footer {
+                text-align: center;
+                font-size: 1.2em;
+                margin-top: 30px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<h1 class='author-title'>Meet Our Teammates</h1>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="author-container">
+        <ul class="author-list">
+            <li>
+                <strong>Ahmed Yasser Taha</strong>
+                <a href="https://www.linkedin.com/in/ahmedyassertaha/" target="_blank">
+                    <img class="linkedin-icon" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </li>
+            <li>
+                <strong>Ahmed AbdulHameed Mahmoud</strong>
+                <a href="https://www.linkedin.com/in/ahmed-abdulhameed-067871239/" target="_blank">
+                    <img class="linkedin-icon" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </li>
+            <li>
+                <strong>Abram Maher Samwel</strong>
+                <a href="https://www.linkedin.com/in/engabrammaher/" target="_blank">
+                    <img class="linkedin-icon" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </li>
+            <li>
+                <strong>Sarah Mohammed Selim</strong>
+                <a href="https://www.linkedin.com/in/sarah-mohamed-selim-a57aa0284/" target="_blank">
+                    <img class="linkedin-icon" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </li>
+            <li>
+                <strong>Naglaa Reda Ali</strong>
+                <a href="https://www.linkedin.com/in/naglaa-reda-6874452a2/" target="_blank">
+                    <img class="linkedin-icon" src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn">
+                    LinkedIn
+                </a>
+            </li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='footer'>We hope you enjoy this journey!</div>", unsafe_allow_html=True)
+
 
 ################################
 Bandass_PAGES = {
