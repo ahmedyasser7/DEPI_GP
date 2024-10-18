@@ -18,3 +18,4 @@ joblib
 requests
 streamlit-lottie
 category_encoders
+faiss

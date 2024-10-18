@@ -10,6 +10,8 @@ from nbconvert import PythonExporter
 import xgboost
 import pickle
 import os
+import faiss
+import joblib
 
 ################################
 # Main app structure
@@ -26,7 +28,7 @@ def load_models():
     base_dir = r"D:\DEPI\Technical\DEPI_GP\GUI\pages"
     model_paths = [
         os.path.join(base_dir, "Accident_Severity_Model_new.pkl"),
-        os.path.join(base_dir, "Casualty_Severity_Model_old.pkl"),
+        os.path.join(base_dir, "Causality_data.pkl"),
         os.path.join(base_dir, "Mapping_Model.pkl"),
         os.path.join(base_dir, "No_Of_Casualities_Model.pkl")
     ]
@@ -35,7 +37,7 @@ def load_models():
     for path in model_paths:
         try:
             with open(path, "rb") as file:
-                models.append(pickle.load(file))
+                models.append(joblib.load(file))
         except Exception as e:
             st.error(f"Error loading model from {path}: {str(e)}")
             return None
@@ -48,152 +50,141 @@ if models:
 else:
     st.stop()
 
+# Dictionary mappings
+days_dict = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
+light_conditions_dict = {'Daylight': 0, 'Darkness - lights lit': 1, 'Darkness - lights unlit': 2, 'Darkness - no lighting': 3, 'Darkness - lighting unknown': 4}
+weather_dict = {'Fine no high winds': 0, 'Raining no high winds': 1, 'Snowing no high winds': 2, 'Fine + high winds': 3,
+                'Raining + high winds': 4, 'Snowing + high winds': 5, 'Fog or mist': 6, 'Other': 7, 'Unknown': 8}
+road_conditions_dict = {'Dry': 0, 'Wet or damp': 1, 'Snow': 2, 'Frost or ice': 3, 'Flood over 3cm. deep': 4, 'Oil or diesel': 5, 'Mud': 6}
+special_conditions_dict = {'None': 0, 'Auto traffic signal - out': 1, 'Auto signal part defective': 2, 'Road sign or marking defective or obscured': 3,
+                           'Roadworks': 4, 'Road surface defective': 5}
+rural_urban_dict = {'Urban': 0, 'Rural': 1, 'Unallocated': 2}
+gender_dict = {'Male': 0, 'Female': 1}
+passenger_dict = {'Not car passenger': 0, 'Front seat passenger': 1, 'Rear seat passenger': 2}
+bus_passenger_dict = {'Not a bus passenger': 0, 'Boarding': 1, 'Standing passenger': 2, 'Seated passenger': 3}
+casualty_type_dict = {
+    'Pedestrian': 0, 'Cyclist': 1, 'Motorcycle 50cc and under rider': 2, 'Motorcycle over 125cc rider': 3, 
+    'Taxi/Private hire car occupant': 4, 'Car occupant': 5, 'Goods vehicle occupant': 6, 'Mobility scooter rider': 7
+}
+hand_drive_dict = {'No': 0, 'Yes': 1}
 
 def page_prediction():
     st.title("Prediction Section")
     prediction_type = st.selectbox("Select what you'd like to predict", [
-                                   "Accident Severity", "Causality severity", "Number of Casualties", "Mapping"])
+                                   "Accident Severity", "Causality Severity", "Number of Casualties", "Mapping"])
 
     if prediction_type == "Accident Severity":
         st.write("Please provide the following details:")
-        days = {1: 'Sunday', 2: 'Monday', 3: 'Tuesday',
-                4: 'Wednesday', 5: 'Thursday', 6: 'Friday', 7: 'Saturday'}
-        light_conditions = {1: 'Daylight', 4: 'Darkness - lights lit', 5: 'Darkness - lights unlit',
-                            6: 'Darkness - no lighting', 7: 'Darkness - lighting unknown'}
-        weather = {1: 'Fine no high winds', 2: 'Raining no high winds', 3: 'Snowing no high winds', 4: 'Fine + high winds',
-                   5: 'Raining + high winds', 6: 'Snowing + high winds', 7: 'Fog or mist', 8: 'Other', 9: 'Unknown'}
-        road = {1: 'Dry', 2: 'Wet or damp', 3: 'Snow', 4: 'Frost or ice',
-                5: 'Flood over 3cm. deep', 6: 'Oil or diesel', 7: 'Mud'}
-        special = {0: 'nan', 1: 'Auto traffic signal - out', 2: 'Auto signal part defective',
-                   3: 'Road sign or marking defective or obscured', 4: 'Roadworks', 5: 'Road surface defective', 6: 'Oil or diesel', 7: 'Mud'}
-        rural = {0: 'Urban', 1: 'Rural', 2: 'Unallocated'}
+        days = list(days_dict.keys())
+        light_conditions = list(light_conditions_dict.keys())
+        weather = list(weather_dict.keys())
+        road = list(road_conditions_dict.keys())
+        special = list(special_conditions_dict.keys())
+        rural = list(rural_urban_dict.keys())
 
-        input1 = st.slider('Select a Longtiude', -4.8, 1.7, step=0.1)  # done
-        input2 = st.slider('Select a Latitude', -2.00000,
-                           6.00000, step=0.1)  # done
-        input3 = st.slider('Select a number of vehicles',
-                           0, 100, step=1)  # done
-        input4 = st.slider('Select a number of casualties',
-                           0, 100, step=1)  # done
-        input5 = st.selectbox("Choose Day of the week",
-                              list(days.values()))  # done
-        input6 = st.slider(
-            'Select a Local_Authority_(District)', -1.4, 2.3, step=0.1)  # done
-        input7 = st.selectbox("Choose location", list(rural.values()))  # done
-        input8 = st.slider('Select a speed limit', 0, 200, step=5)  # done
-        input9 = st.selectbox("Choose the condition of the light", list(
-            light_conditions.values()))  # done
-        input10 = st.selectbox(
-            # done
-            "Choose the condition of the weather", list(weather.values()))
-        input11 = st.selectbox(
-            "Choose the condition of the Road", list(road.values()))  # done
-        input12 = st.selectbox(
-            "Choose the speacial condition", list(special.values()))  # done
-
-        Accident_Severity_input = np.array(
-            [input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12])
+        input1 = st.slider('Select a Longitude', -4.8, 1.7, step=0.1)
+        input2 = st.slider('Select a Latitude', -2.0, 6.0, step=0.1)
+        input3 = st.slider('Select number of vehicles', 0, 100, step=1)
+        input4 = st.slider('Select number of casualties', 0, 100, step=1)
+        input5 = st.selectbox("Choose Day of the Week", days)
+        input6 = st.slider('Select Local Authority (District)', -1.4, 2.3, step=0.1)
+        input7 = st.selectbox("Choose Location", rural)
+        input8 = st.slider('Select a Speed Limit', 0, 200, step=5)
+        input9 = st.selectbox("Choose Light Conditions", light_conditions)
+        input10 = st.selectbox("Choose Weather Conditions", weather)
+        input11 = st.selectbox("Choose Road Conditions", road)
+        input12 = st.selectbox("Choose Special Conditions", special)
+        
+        Accident_Severity_input = np.array([
+            input1, input2, input3, input4, 
+            days_dict[input5], input6, rural_urban_dict[input7], input8,
+            light_conditions_dict[input9], weather_dict[input10], 
+            road_conditions_dict[input11], special_conditions_dict[input12]
+        ])
+        
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
-                if input1 and input2 and input3 and input4 and input5 and input6 and input7 and input8 and input9 and input10 and input11 and input12:
-                    prediction = model1.predict(Accident_Severity_input)
-                    st.write(f"Prediction result for {
-                             prediction_type}: {prediction[0]}")
-                    pass
+                if all([input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12]):
+                    prediction = model1.predict([Accident_Severity_input])
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
                 else:
                     st.warning("Please fill all the inputs!")
 
-    elif prediction_type == "Causality severity":
+    elif prediction_type == "Causality Severity":
         st.write("Please provide the following details:")
-        Casualty_type = {
-            0: 'Pedestrian', 1: 'Cyclist', 2: 'Motorcycle 50cc and under rider or passenger',
-            3: 'Motorcycle 125cc and under rider or passenger', 4: 'Motorcycle over 125cc and up to 500cc rider or passenger',
-            5: 'Motorcycle over 500cc rider or passenger', 8: 'Taxi/Private hire car occupant', 9: 'Car occupant',
-            10: 'Minibus (8 - 16 passenger seats) occupant', 11: 'Bus or coach occupant (17 or more pass seats)',
-            16: 'Horse rider', 17: 'Agricultural vehicle occupant', 18: 'Tram occupant', 19: 'Van/Goods vehicle (3.5 tonnes mgw or under) occupant',
-            20: 'Goods vehicle (over 3.5t. and under 7.5t.) occupant', 21: 'Goods vehicle (7.5 tonnes mgw and over) occupant',
-            22: 'Mobility scooter rider', 23: 'Electric motorcycle rider or passenger', 90: 'Other vehicle occupant',
-            97: 'Motorcycle - unknown cc rider or passenger', 98: 'Goods vehicle (unknown weight) occupant'
-        }
-        gender = {0: 'Male', 1: 'Female'}
-        passenger = {0: 'Not car passenger', 1: 'Front seat passenger', 2:	'Rear seat passenger'}
-        bus = {0: 'Not a bus or coach passenger', 1: 'Boarding', 2: 'Alighting', 
-               3: 'Standing passenger', 4: 'Seated passenger'}
-        
-        input1 = st.selectbox("Choose the gender",
-                              list(gender.values()))  # done
-        input2 = st.slider('Age of Casualty',
-                           1, 100, step=1)  # done
-        input3 = st.selectbox("Car Passenger",
-                              list(passenger.values()))  # done
-        input4 = st.selectbox("Bus or Coach Passenger",
-                              list(bus.values())) # done
-        input5 = st.selectbox("Choose Casualty Type",
-                              list(Casualty_type.values()))  # done
-        
-        Casualty_Severity_input = np.array([input1, input2, input3, input4, input5])
+        Casualty_type = list(casualty_type_dict.keys())
+        gender = list(gender_dict.keys())
+        passenger = list(passenger_dict.keys())
+        bus = list(bus_passenger_dict.keys())
 
+        input1 = st.selectbox("Choose Gender", gender)
+        input2 = st.slider('Age of Casualty', 1, 100, step=1)
+        input3 = st.selectbox("Car Passenger", passenger)
+        input4 = st.selectbox("Bus Passenger", bus)
+        input5 = st.selectbox("Casualty Type", Casualty_type)
+
+        # Map user-friendly inputs to numerical values for the model
+        Causality_input = np.array([
+            gender_dict[input1], input2, passenger_dict[input3], 
+            bus_passenger_dict[input4], casualty_type_dict[input5]
+        ])
+        
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
-                if input1 and input2 and input3 and input4 and input5:
-                    prediction = model2.predict(Casualty_Severity_input)
+                if all([input1, input2, input3, input4, input5]):
+                    prediction = model2.predict([Causality_input])
                     st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
-                    # pass
                 else:
                     st.warning("Please fill all the inputs!")
 
     elif prediction_type == "Number of Casualties":
         st.write("Please provide the following details:")
-        road = {1: 'Dry', 2: 'Wet or damp', 3: 'Snow', 4: 'Frost or ice',
-                5: 'Flood over 3cm. deep', 6: 'Oil or diesel', 7: 'Mud'}
-        weather = {1: 'Fine no high winds', 2: 'Raining no high winds', 3: 'Snowing no high winds', 4: 'Fine + high winds',
-                   5: 'Raining + high winds', 6: 'Snowing + high winds', 7: 'Fog or mist', 8: 'Other', 9: 'Unknown'}
-        light_conditions = {1: 'Daylight', 4: 'Darkness - lights lit', 5: 'Darkness - lights unlit',
-                            6: 'Darkness - no lighting', 7: 'Darkness - lighting unknown'}
-        
-        input1 = st.slider('Select a number of vehicles',
-                           0, 100, step=1)  # done
-        input2 = st.slider('Select a speed limit', 0, 200, step=5)  # done
-        input3 = st.selectbox("Choose the condition of the light", list(
-            light_conditions.values()))  # done
-        input4 = st.selectbox("Choose the condition of the weather", list(weather.values())) # done
-        input5 = st.selectbox(
-            "Choose the condition of the Road", list(road.values()))  # done
-        Number_of_Casualties_input = np.array([input1, input2, input3, input4, input5])
-        
+        road = list(road_conditions_dict.keys())
+        weather = list(weather_dict.keys())
+        light_conditions = list(light_conditions_dict.keys())
 
+        input1 = st.slider('Select number of vehicles', 0, 100, step=1)
+        input2 = st.slider('Select Speed Limit', 0, 200, step=5)
+        input3 = st.selectbox("Light Conditions", light_conditions)
+        input4 = st.selectbox("Weather Conditions", weather)
+        input5 = st.selectbox("Road Conditions", road)
+
+        # Map user-friendly inputs to numerical values for the model
+        Casualties_input = np.array([
+            input1, input2, light_conditions_dict[input3], 
+            weather_dict[input4], road_conditions_dict[input5]
+        ])
+        
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
-                if input1 and input2 and input3 and input4 and input5:
-                    prediction = model3.predict(Number_of_Casualties_input)
+                if all([input1, input2, input3, input4, input5]):
+                    prediction = model3.predict([Casualties_input])
                     st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
-                    # pass
                 else:
                     st.warning("Please fill all the inputs!")
 
     elif prediction_type == "Mapping":
         st.write("Please provide the following details:")
-        
-        hand = {'No': 1, 'Yes': 2}
-        
-        input1 = st.selectbox("Was Vehicle Left Hand Drive?", list(
-            hand.keys()))  # done
-        input2 = st.slider("Age of Driver", 10, 100, step=1)  # done
-        input3 = st.slider("Age of Vehicle", 10, 100, step=1)  # done
-        
-        Accident_involved_input = np.array([hand[input1], input2, input3]) 
+        hand = list(hand_drive_dict.keys())
 
+        input1 = st.selectbox("Was Vehicle Left Hand Drive?", hand)
+        input2 = st.slider("Age of Driver", 10, 100, step=1)
+        input3 = st.slider("Age of Vehicle", 10, 100, step=1)
+
+        # Map user-friendly inputs to numerical values for the model
+        Mapping_input = np.array([
+            hand_drive_dict[input1], input2, input3
+        ])
+        
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
-                if input1 and input2 and input3:
-                    prediction = model4.predict(Accident_involved_input)
-                    st.write(f"Prediction result for {
-                             prediction_type}: {prediction[0]}")
-                    # pass
+                if all([input1, input2, input3]):
+                    prediction = model4.predict([Mapping_input])
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
                 else:
                     st.warning("Please fill all the inputs!")
 
