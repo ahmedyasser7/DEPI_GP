@@ -27,9 +27,9 @@ def load_models():
     print(BASE_DIR)
     base_dir = os.path.dirname(os.path.abspath(__file__))
     model_paths = [
-        os.path.join(base_dir, "Accident_Severity_Model_new.pkl"),
+        os.path.join(base_dir, "scaler_and_model.pkl"),
         os.path.join(base_dir, "Causality_data.pkl"),
-        os.path.join(base_dir, "No_Of_Casualities_Model.pkl"),
+        os.path.join(base_dir, "xgb_model.pkl"),
         os.path.join(base_dir, "Mapping_Model.pkl")
     ]
 
@@ -160,7 +160,7 @@ def page_prediction():
             with st.spinner("Predicting..."):
                 if all([input1, input2, input3, input4, input5]):
                     prediction = model3.predict([Casualties_input])
-                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                    st.write(f"Prediction result for {prediction_type}: {round(prediction[0])}")
                 else:
                     st.warning("Please fill all the inputs!")
 
