@@ -29,8 +29,8 @@ def load_models():
     model_paths = [
         os.path.join(base_dir, "Accident_Severity_Model_new.pkl"),
         os.path.join(base_dir, "Causality_data.pkl"),
-        os.path.join(base_dir, "Mapping_Model.pkl"),
-        os.path.join(base_dir, "No_Of_Casualities_Model.pkl")
+        os.path.join(base_dir, "No_Of_Casualities_Model.pkl"),
+        os.path.join(base_dir, "Mapping_Model.pkl")
     ]
 
     models = []
@@ -124,7 +124,6 @@ def page_prediction():
         input4 = st.selectbox("Bus Passenger", bus)
         input5 = st.selectbox("Casualty Type", Casualty_type)
 
-        # Map user-friendly inputs to numerical values for the model
         Causality_input = np.array([
             gender_dict[input1], input2, passenger_dict[input3], 
             bus_passenger_dict[input4], casualty_type_dict[input5]
@@ -151,7 +150,6 @@ def page_prediction():
         input4 = st.selectbox("Weather Conditions", weather)
         input5 = st.selectbox("Road Conditions", road)
 
-        # Map user-friendly inputs to numerical values for the model
         Casualties_input = np.array([
             input1, input2, light_conditions_dict[input3], 
             weather_dict[input4], road_conditions_dict[input5]
@@ -174,7 +172,6 @@ def page_prediction():
         input2 = st.slider("Age of Driver", 10, 100, step=1)
         input3 = st.slider("Age of Vehicle", 10, 100, step=1)
 
-        # Map user-friendly inputs to numerical values for the model
         Mapping_input = np.array([
             hand_drive_dict[input1], input2, input3
         ])
