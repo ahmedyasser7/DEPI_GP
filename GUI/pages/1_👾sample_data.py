@@ -101,12 +101,14 @@ def Page_about_data():
     
     st.write("## Data Analysis and Visualization ")
     st.write("We have performed various statistical analysis and visualizations to help you gain insights into the data")
+    st.divider()
+    
     st.write("### Some Of Data Art")
     
     images = [
-        r"GUI\pages\analysis_images\correlation.png",
-        r"GUI\pages\analysis_images\HeatmapofAccidentSeveritybyRoadSurface.png",
-        r"GUI\pages\analysis_images\rural_vs_urban.png",
+        os.path.join(ANALYSIS_IMAGE_DIR, "correlation.png"),
+        os.path.join(ANALYSIS_IMAGE_DIR, "HeatmapofAccidentSeveritybyRoadSurface.png"),
+        os.path.join(ANALYSIS_IMAGE_DIR, "rural_vs_urban.png"),
     ]
     
     st.markdown("""
@@ -141,20 +143,32 @@ def Page_about_data():
         </style>
     """, unsafe_allow_html=True)
 
-    if "carousel_index" not in st.session_state:
-        st.session_state.carousel_index = 0
-
-    st.image(images[st.session_state.carousel_index], width=700)
-
+    current_image_path = images[st.session_state.carousel_index]
+    current_image = load_image(current_image_path)
+    if current_image is not None:
+        st.image(current_image, width=700)
+    else:
+        st.error(f"Failed to load image at index {st.session_state.carousel_index}.")
     prev, _, next = st.columns([1, 10, 1])
-    
-    if prev.button("⬅️", key="prev", help="Previous image", type="primary"):
+
+    if prev.button("back", key="prev", help="Previous image", type="primary"):
         st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(images)
 
-    if next.button("➡️", key="next", help="Next image", type="primary"):
+    if next.button("Next", key="next", help="Next image", type="primary"):
         st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
 
+    # Display current image index
     st.write(f"Image {st.session_state.carousel_index + 1} of {len(images)}")
+
+    # Custom slider indicators for the images
+    st.markdown("""
+        <div class="slider-indicators">
+    """, unsafe_allow_html=True)
+
+    for i in range(len(images)):
+        active_class = "active" if i == st.session_state.carousel_index else ""
+        st.markdown(f"<span class='{active_class}'></span>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
     st.divider()
     
     st.write("## Data Contribution")
