@@ -16,29 +16,29 @@ st.set_page_config(page_title="Emergency insights", layout="wide", page_icon=r"G
 ################################
 # Emergency assistance sub-pages:
 # Model information
-# def load_models():
-#     model_paths = [
-#         r"Models/Accident_Severity_Model_new.pkl",
-#         r"Models/Casualty_Severity_Model_new.pkl",
-#         r"Models/Mapping_Model.pkl",
-#         r"Models/No_Of_Casualities_Model.pkl"
-#     ]
+def load_models():
+    model_paths = [
+        r"Models/Accident_Severity_Model_new.pkl",
+        r"Models/Casualty_Severity_Model_new.pkl",
+        r"Models/Mapping_Model.pkl",
+        r"Models/No_Of_Casualities_Model.pkl"
+    ]
 
-#     models = []
-#     for path in model_paths:
-#         try:
-#             with open(path, "rb") as file:
-#                 models.append(pickle.load(file))
-#         except Exception as e:
-#             st.error(f"Error loading model from {path}: {str(e)}")
-#             return None
-#     return tuple(models)
+    models = []
+    for path in model_paths:
+        try:
+            with open(path, "rb") as file:
+                models.append(pickle.load(file))
+        except Exception as e:
+            st.error(f"Error loading model from {path}: {str(e)}")
+            return None
+    return tuple(models)
 
-# models = load_models()
-# if models:
-#     model1, model2, model3, model4 = models
-# else:
-#     st.stop()
+models = load_models()
+if models:
+    model1, model2, model3, model4 = models
+else:
+    st.stop()
 
 def page_prediction():
     st.title("Prediction Section")

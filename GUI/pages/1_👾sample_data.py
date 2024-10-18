@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 from nbconvert import PythonExporter
+import xgboost
 import pickle
 import os
 ###############################
@@ -110,7 +111,12 @@ def Page_about_data():
         os.path.join(ANALYSIS_IMAGE_DIR, "HeatmapofAccidentSeveritybyRoadSurface.png"),
         os.path.join(ANALYSIS_IMAGE_DIR, "rural_vs_urban.png"),
     ]
-    
+
+    # Initialize the carousel index in session state if it doesn't exist
+    if "carousel_index" not in st.session_state:
+        st.session_state.carousel_index = 0
+
+    # HTML and CSS styles
     st.markdown("""
         <style>
         .btn-style {
@@ -143,21 +149,27 @@ def Page_about_data():
         </style>
     """, unsafe_allow_html=True)
 
+    # Display the current image based on the carousel index
     current_image_path = images[st.session_state.carousel_index]
     current_image = load_image(current_image_path)
+
     if current_image is not None:
         st.image(current_image, width=700)
     else:
         st.error(f"Failed to load image at index {st.session_state.carousel_index}.")
+
+    # Create navigation buttons
     prev, _, next = st.columns([1, 10, 1])
 
-    if prev.button("back", key="prev", help="Previous image", type="primary"):
+    # Previous button logic
+    if prev.button("Back", key="prev", help="Previous image", type="primary"):
         st.session_state.carousel_index = (st.session_state.carousel_index - 1) % len(images)
 
+    # Next button logic
     if next.button("Next", key="next", help="Next image", type="primary"):
         st.session_state.carousel_index = (st.session_state.carousel_index + 1) % len(images)
 
-    # Display current image index
+    # Display the current image index
     st.write(f"Image {st.session_state.carousel_index + 1} of {len(images)}")
 
     # Custom slider indicators for the images
@@ -168,6 +180,7 @@ def Page_about_data():
     for i in range(len(images)):
         active_class = "active" if i == st.session_state.carousel_index else ""
         st.markdown(f"<span class='{active_class}'></span>", unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
     st.divider()
     
