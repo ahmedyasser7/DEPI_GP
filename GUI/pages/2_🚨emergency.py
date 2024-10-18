@@ -25,7 +25,7 @@ st.set_page_config(page_title="Emergency insights",
 def load_models():
     BASE_DIR = os.getcwd()  # Using the current working directory
     print(BASE_DIR)
-    base_dir = r"D:\DEPI\Technical\DEPI_GP\GUI\pages"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     model_paths = [
         os.path.join(base_dir, "Accident_Severity_Model_new.pkl"),
         os.path.join(base_dir, "Causality_data.pkl"),
@@ -71,7 +71,7 @@ hand_drive_dict = {'No': 0, 'Yes': 1}
 def page_prediction():
     st.title("Prediction Section")
     prediction_type = st.selectbox("Select what you'd like to predict", [
-                                   "Accident Severity", "Causality Severity", "Number of Casualties", "Mapping"])
+                                   "Accident Severity", "Causality Severity", "Number of Casualties", "Car and Driver Involved"])
 
     if prediction_type == "Accident Severity":
         st.write("Please provide the following details:")
@@ -164,7 +164,7 @@ def page_prediction():
                 else:
                     st.warning("Please fill all the inputs!")
 
-    elif prediction_type == "Mapping":
+    elif prediction_type == "Car and Driver Involved":
         st.write("Please provide the following details:")
         hand = list(hand_drive_dict.keys())
 
