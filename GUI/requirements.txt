@@ -14,3 +14,7 @@ xgboost
 altair
 scipy
 lxml[html_clean]
+joblib
+requests
+streamlit-lottie
+category_encoders
