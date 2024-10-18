@@ -22,12 +22,13 @@ st.set_page_config(page_title="Emergency insights",
 
 def load_models():
     BASE_DIR = os.getcwd()  # Using the current working directory
-
+    print(BASE_DIR)
+    base_dir = r"D:\DEPI\Technical\DEPI_GP\GUI\pages"
     model_paths = [
-        os.path.join(BASE_DIR, "Models", "Accident_Severity_Model_new.pkl"),
-        # os.path.join(BASE_DIR, "Models", "Casualty_Severity_Model_new.pkl"),
-        os.path.join(BASE_DIR, "Models", "Mapping_Model.pkl"),
-        os.path.join(BASE_DIR, "Models", "No_Of_Casualities_Model.pkl")
+        os.path.join(base_dir, "Accident_Severity_Model_new.pkl"),
+        os.path.join(base_dir, "Casualty_Severity_Model_old.pkl"),
+        os.path.join(base_dir, "Mapping_Model.pkl"),
+        os.path.join(base_dir, "No_Of_Casualities_Model.pkl")
     ]
 
     models = []
@@ -43,7 +44,7 @@ def load_models():
 
 models = load_models()
 if models:
-    model1, model3, model4 = models
+    model1, model2, model3, model4 = models
 else:
     st.stop()
 
@@ -116,68 +117,80 @@ def page_prediction():
             97: 'Motorcycle - unknown cc rider or passenger', 98: 'Goods vehicle (unknown weight) occupant'
         }
         gender = {0: 'Male', 1: 'Female'}
+        passenger = {0: 'Not car passenger', 1: 'Front seat passenger', 2:	'Rear seat passenger'}
+        bus = {0: 'Not a bus or coach passenger', 1: 'Boarding', 2: 'Alighting', 
+               3: 'Standing passenger', 4: 'Seated passenger'}
+        
         input1 = st.selectbox("Choose the gender",
                               list(gender.values()))  # done
-        input2 = st.text_input("Age of Casualty")
-        input3 = st.text_input("Car Passenger")
-        input4 = st.text_input("Bus or Coach Passenger")
+        input2 = st.slider('Age of Casualty',
+                           1, 100, step=1)  # done
+        input3 = st.selectbox("Car Passenger",
+                              list(passenger.values()))  # done
+        input4 = st.selectbox("Bus or Coach Passenger",
+                              list(bus.values())) # done
         input5 = st.selectbox("Choose Casualty Type",
                               list(Casualty_type.values()))  # done
-
-        Casualty_Severity = pd.DataFrame({
-            'Sex_of_Casualty': [input1], 'Age_of_Casualty': [input2], 'Car_Passenger': [input3], 'Bus_or_Coach_Passenger': [input4],
-            'Casualty_Type': [input5]
-        }, index=[0])
+        
+        Casualty_Severity_input = np.array([input1, input2, input3, input4, input5])
 
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
                 if input1 and input2 and input3 and input4 and input5:
-                    # prediction = model2.predict(Casualty_Severity)
-                    # st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
-                    pass
+                    prediction = model2.predict(Casualty_Severity_input)
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                    # pass
                 else:
                     st.warning("Please fill all the inputs!")
 
     elif prediction_type == "Number of Casualties":
         st.write("Please provide the following details:")
-        input1 = st.text_input("Number of Vehicles")
-        input2 = st.text_input("Speed limit")
-        input3 = st.text_input("Light Conditions")
-        input4 = st.text_input("Weather Conditions")
-        input5 = st.text_input("Road Surface Conditions")
-
-        Number_of_Casualties = pd.DataFrame({
-            'Number_of_Vehicles': [input1], 'Speed_limit': [input2], 'Light_Conditions': [input3], 'Weather_Conditions': [input4],
-            'Road_Surface_Conditions': [input5]
-        }, index=[0])
+        road = {1: 'Dry', 2: 'Wet or damp', 3: 'Snow', 4: 'Frost or ice',
+                5: 'Flood over 3cm. deep', 6: 'Oil or diesel', 7: 'Mud'}
+        weather = {1: 'Fine no high winds', 2: 'Raining no high winds', 3: 'Snowing no high winds', 4: 'Fine + high winds',
+                   5: 'Raining + high winds', 6: 'Snowing + high winds', 7: 'Fog or mist', 8: 'Other', 9: 'Unknown'}
+        light_conditions = {1: 'Daylight', 4: 'Darkness - lights lit', 5: 'Darkness - lights unlit',
+                            6: 'Darkness - no lighting', 7: 'Darkness - lighting unknown'}
+        
+        input1 = st.slider('Select a number of vehicles',
+                           0, 100, step=1)  # done
+        input2 = st.slider('Select a speed limit', 0, 200, step=5)  # done
+        input3 = st.selectbox("Choose the condition of the light", list(
+            light_conditions.values()))  # done
+        input4 = st.selectbox("Choose the condition of the weather", list(weather.values())) # done
+        input5 = st.selectbox(
+            "Choose the condition of the Road", list(road.values()))  # done
+        Number_of_Casualties_input = np.array([input1, input2, input3, input4, input5])
+        
 
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
                 if input1 and input2 and input3 and input4 and input5:
-                    prediction = model3.predict(Number_of_Casualties)
-                    st.write(f"Prediction result for {
-                             prediction_type}: {prediction[0]}")
+                    prediction = model3.predict(Number_of_Casualties_input)
+                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
                     # pass
                 else:
                     st.warning("Please fill all the inputs!")
 
     elif prediction_type == "Mapping":
         st.write("Please provide the following details:")
-        input1 = st.text_input("Was Vehicle Left Hand Drive?")
-        input2 = st.text_input("Age of Driver")
-        input3 = st.text_input("Age of Vehicle")
-
-        Accident_involved = pd.DataFrame({
-            'Was_Vehicle_Left_Hand_Drive': [input1], 'Age_of_Driver': [input2], 'Age_of_Vehicle': [input3]
-        }, index=[0])
+        
+        hand = {'No': 1, 'Yes': 2}
+        
+        input1 = st.selectbox("Was Vehicle Left Hand Drive?", list(
+            hand.keys()))  # done
+        input2 = st.slider("Age of Driver", 10, 100, step=1)  # done
+        input3 = st.slider("Age of Vehicle", 10, 100, step=1)  # done
+        
+        Accident_involved_input = np.array([hand[input1], input2, input3]) 
 
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
                 if input1 and input2 and input3:
-                    prediction = model4.predict(Accident_involved)
+                    prediction = model4.predict(Accident_involved_input)
                     st.write(f"Prediction result for {
                              prediction_type}: {prediction[0]}")
                     # pass
