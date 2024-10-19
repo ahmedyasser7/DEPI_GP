@@ -28,7 +28,7 @@ def load_models():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     model_paths = [
         os.path.join(base_dir, "scaler_and_model.pkl"),
-        os.path.join(base_dir, "Causality_data.pkl"),
+        os.path.join(base_dir, "Causality_data_new2.pkl"),
         os.path.join(base_dir, "xgb_model.pkl"),
         os.path.join(base_dir, "Mapping_Model.pkl")
     ]
@@ -57,9 +57,9 @@ scaler = model2['scaler']
 pca = model2['pca']
 index = model2['faiss_index']
 label_mapping = model2['label_mapping']
-y_balanced = model2['y_balanced']
 
-if not all([scaler, pca, index, label_mapping, y_balanced]):
+
+if not all([scaler, pca, index, label_mapping]):
     st.error("Some components are missing from the model data. Please ensure all necessary components are saved.")
     st.stop()
 
@@ -148,12 +148,24 @@ def page_prediction():
                 if all([input1, input2, input3, input4, input5]):
                     input_scaled = scaler.transform(Causality_input)
                     input_pca = pca.transform(input_scaled)
-                    k = 3 
-                    distances, indices = index.search(input_pca, k)
-                    neighbor_labels = y_balanced[indices[0]]
-                    predicted_label_numeric = np.bincount(neighbor_labels).argmax()
-                    predicted_label = label_mapping[predicted_label_numeric]
+                    k = 3  
+                    distances, indices = index.search(np.array(input_pca, dtype=np.float32), k)
+                    
+                    # st.write(f"indices: {indices[0]}")
+                    
+                    neighbor_labels = []
+                    for y in indices[0]:
+                        if y in label_mapping:
+                            neighbor_labels.append(label_mapping[y])
+                        else:
+                            # st.warning(f"Warning: Label for index {y} not found in label_mapping. Using default value.")
+                            neighbor_labels.append(0)
 
+                    
+                    predicted_label_numeric = np.bincount(neighbor_labels).argmax()
+                    predicted_label = label_mapping.get(predicted_label_numeric, "Unknown")
+                    
+                    
                     st.write(f"Prediction result for {prediction_type}: {predicted_label}")
                 else:
                     st.warning("Please fill all the inputs!")
