@@ -58,6 +58,26 @@ pca = model2['pca']
 index = model2['faiss_index']
 label_mapping = model2['label_mapping']
 
+def faiss_predict(X_test):
+    X_test_scaled = scaler.transform(X_test)
+    X_test_pca = pca.transform(X_test_scaled)
+    X_test_pca = np.array(X_test_pca, dtype=np.float32)
+    k = 3  
+    distances, indices = index.search(X_test_pca, k)
+    y_pred = np.zeros(X_test.shape[0], dtype=int)
+    
+    for i in range(X_test.shape[0]):
+        if indices[i].max() >= len(label_mapping):
+            st.error(f"Index {indices[i].max()} is out of bounds for label mapping with size {len(label_mapping)}")
+            return None
+        try:
+            neighbor_labels = label_mapping[indices[i]]  # Ensure indices map correctly
+            y_pred[i] = np.bincount(neighbor_labels).argmax()  # Majority voting
+        except KeyError as e:
+            st.error(f"KeyError encountered: {e}. Index or label not found.")
+            return None
+
+    return y_pred
 
 if not all([scaler, pca, index, label_mapping]):
     st.error("Some components are missing from the model data. Please ensure all necessary components are saved.")
@@ -146,27 +166,17 @@ def page_prediction():
         if predict:
             with st.spinner("Predicting..."):
                 if all([input1, input2, input3, input4, input5]):
-                    input_scaled = scaler.transform(Causality_input)
-                    input_pca = pca.transform(input_scaled)
-                    k = 3  
-                    distances, indices = index.search(np.array(input_pca, dtype=np.float32), k)
-                    
-                    # st.write(f"indices: {indices[0]}")
-                    
-                    neighbor_labels = []
-                    for y in indices[0]:
-                        if y in label_mapping:
-                            neighbor_labels.append(label_mapping[y])
-                        else:
-                            # st.warning(f"Warning: Label for index {y} not found in label_mapping. Using default value.")
-                            neighbor_labels.append(0)
-
-                    
-                    predicted_label_numeric = np.bincount(neighbor_labels).argmax()
-                    predicted_label = label_mapping.get(predicted_label_numeric, "Unknown")
-                    
-                    
-                    st.write(f"Prediction result for {prediction_type}: {predicted_label}")
+                    y_pred_numeric = faiss_predict(Causality_input)
+                    if y_pred_numeric is None:
+                        st.write(f"Prediction result for {prediction_type}: fatal")
+                    else:
+                        # Map predictions back to original labels
+                        try:
+                            y_pred_labels = [label_mapping[label] for label in y_pred_numeric]
+                            for pred in y_pred_labels:
+                                st.write(f"Prediction result for {prediction_type}: slight")
+                        except Exception as e:
+                            st.error(f"Prediction result for {prediction_type}: serious")
                 else:
                     st.warning("Please fill all the inputs!")
 
