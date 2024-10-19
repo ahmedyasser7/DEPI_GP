@@ -50,6 +50,19 @@ if models:
 else:
     st.stop()
 
+accident_scaler = model1.get('scaler')
+accident_model = model1.get('model')
+
+scaler = model2['scaler']
+pca = model2['pca']
+index = model2['faiss_index']
+label_mapping = model2['label_mapping']
+y_balanced = model2['y_balanced']
+
+if not all([scaler, pca, index, label_mapping, y_balanced]):
+    st.error("Some components are missing from the model data. Please ensure all necessary components are saved.")
+    st.stop()
+
 # Dictionary mappings
 days_dict = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
 light_conditions_dict = {'Daylight': 0, 'Darkness - lights lit': 1, 'Darkness - lights unlit': 2, 'Darkness - no lighting': 3, 'Darkness - lighting unknown': 4}
@@ -106,7 +119,7 @@ def page_prediction():
         if predict:
             with st.spinner("Predicting..."):
                 if all([input1, input2, input3, input4, input5, input6, input7, input8, input9, input10, input11, input12]):
-                    prediction = model1.predict([Accident_Severity_input])
+                    prediction = accident_model.predict([Accident_Severity_input])
                     st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
                 else:
                     st.warning("Please fill all the inputs!")
@@ -124,17 +137,24 @@ def page_prediction():
         input4 = st.selectbox("Bus Passenger", bus)
         input5 = st.selectbox("Casualty Type", Casualty_type)
 
-        Causality_input = np.array([
+        Causality_input = np.array([[
             gender_dict[input1], input2, passenger_dict[input3], 
             bus_passenger_dict[input4], casualty_type_dict[input5]
-        ])
+        ]])
         
         predict = st.button("Predict")
         if predict:
             with st.spinner("Predicting..."):
                 if all([input1, input2, input3, input4, input5]):
-                    prediction = model2.predict([Causality_input])
-                    st.write(f"Prediction result for {prediction_type}: {prediction[0]}")
+                    input_scaled = scaler.transform(Causality_input)
+                    input_pca = pca.transform(input_scaled)
+                    k = 3 
+                    distances, indices = index.search(input_pca, k)
+                    neighbor_labels = y_balanced[indices[0]]
+                    predicted_label_numeric = np.bincount(neighbor_labels).argmax()
+                    predicted_label = label_mapping[predicted_label_numeric]
+
+                    st.write(f"Prediction result for {prediction_type}: {predicted_label}")
                 else:
                     st.warning("Please fill all the inputs!")
 
