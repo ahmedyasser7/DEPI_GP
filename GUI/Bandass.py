@@ -39,7 +39,7 @@ def page_image_display():
 def Page_overview():
     st.title("Overview")
     st.write(f"The link for the GitHub Repo: https://github.com/ahmedyasser7/DEPI_GP")
-    st.write(f"The link for the Documentation and the presentaion: {4}")
+    st.write(f"The link for the Documentation and the presentaion: https://drive.google.com/drive/u/0/folders/1bC6tk-OJXSzV4igfXuW8p-NrJL9f-Ohr?lfhs=2")
 
 
 ################################
