@@ -13,3 +13,5 @@ You can access the Colab notebook for this project [here](https://colab.research
 - [Report](https://drive.google.com/drive/folders/1Bqg1X3Ld0hXA56cQSos1BdJnNZs4_Tdf?usp=drive_link)
 - [Presentation](https://drive.google.com/drive/folders/1bC8n6dle8lH48GlE3zndMX3NqkpI4U-i?usp=drive_link)
 
+## Our App
+- [Application](https://accidentsapp-depi.streamlit.app/)
