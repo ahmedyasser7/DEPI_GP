@@ -1,55 +1,39 @@
-import nbformat
 import streamlit as st
-from PIL import Image
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 from openpyxl import load_workbook
-import plotly.express as px
-from nbconvert import PythonExporter
-import pickle
+import os
 
+st.set_page_config(page_title="Feedback", layout="wide", page_icon="GUI/home_images/good-feedback.png")
 
-################################
-# Main app structure
-st.set_page_config(page_title="Feedback", layout="wide", page_icon= r"GUI\home_images\good-feedback.png")
+def save_feedback_to_excel(feedback):
+    file_path = "feedbacks.xlsx"
+    feedback_df = pd.DataFrame({"Feedback": [feedback]})
 
-################################
-################################
-# def save_feedback_to_excel(feedback):
-#     file_path = "feedbacks.xlsx"
+    try:
+        if os.path.exists(file_path):
+            existing_data = pd.read_excel(file_path)
+            combined_data = pd.concat([existing_data, feedback_df], ignore_index=True)
+        else:
+            combined_data = feedback_df
 
-#     df = pd.DataFrame({"Feedback": [feedback]})
+        with pd.ExcelWriter(file_path, engine='openpyxl', mode='w') as writer:
+            combined_data.to_excel(writer, index=False)
 
-#     try:
-#         book = load_workbook(file_path)
-#         writer = pd.ExcelWriter(file_path, engine='openpyxl')
-#         writer.book = book
-#         writer.sheets = {ws.title: ws for ws in book.worksheets}
-#         reader = pd.read_excel(file_path)
-#         df.to_excel(writer, index=False, header=False, startrow=len(reader) + 1)
-#     except FileNotFoundError:
-#         df.to_excel(file_path, index=False)
+    except Exception as e:
+        st.error(f"An error occurred while saving feedback: {str(e)}")
 
-#     writer.save()
-#     writer.close()
-
-################################
 def Page_feedback():
-    st.title("Your feedback")
+    st.title("Your Feedback")
     user_input = st.text_input("Enter your feedback or data")
     if st.button("Submit"):
         if user_input:
-            # save_feedback_to_excel(user_input)
-            st.write(f"Thank you for your feedback!")
+            save_feedback_to_excel(user_input)
+            st.write("Thank you for your feedback!")
         else:
             st.warning("Please enter your feedback before submitting!")
 
-################################
 def main():
-    page = Page_feedback
-    page()
+    Page_feedback()
 
 if __name__ == "__main__":
     main()
