@@ -16,7 +16,7 @@ HOME_IMAGE_DIR = os.path.join(HOME_BASE_DIR, "home_images")  # Set the path to t
 
 ################################
 # Main app structure
-st.set_page_config(page_title="Bandaas", layout="wide", page_icon= r"GUI/home_images/accident-car.png")
+st.set_page_config(page_title="Accident Auditor", layout="wide", page_icon= r"GUI/home_images/accident-car.png")
 
 @st.cache_resource
 def load_image(image_path):
